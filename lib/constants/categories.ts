@@ -44,6 +44,7 @@ export const CAT_IDS = {
   // ── Health & Wellbeing ─────────────────────────────────────────────────────
   HEALTH_BEAUTY:        'sys_health_beauty',
   HEALTH_PROFESSIONAL:  'sys_health_professional',
+  HEALTH_PHARMACY:      'sys_health_pharmacy',
 
   // ── Income ─────────────────────────────────────────────────────────────────
   INCOME_SALARY:   'sys_income_salary',
@@ -115,6 +116,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   // ── Health & Wellbeing ─────────────────────────────────────────────────────
   systemCategory(CAT_IDS.HEALTH_BEAUTY,       'Beauty Care',         '💅', '#ef4444', 'expense', CAT_IDS.HEALTH),
   systemCategory(CAT_IDS.HEALTH_PROFESSIONAL, 'Professional Services','👔', '#ef4444', 'expense', CAT_IDS.HEALTH),
+  systemCategory(CAT_IDS.HEALTH_PHARMACY,     'Pharmacy',            '💊', '#ef4444', 'expense', CAT_IDS.HEALTH),
 
   // ── Income ─────────────────────────────────────────────────────────────────
   systemCategory(CAT_IDS.INCOME_SALARY,   'Salary',       '💼', '#22c55e', 'income', CAT_IDS.INCOME),

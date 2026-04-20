@@ -221,7 +221,7 @@ export function ImportPreviewModal({
                 <col className="w-24" />
                 <col />
                 <col className="w-24" />
-                <col className="w-56" />
+                <col className="w-[26rem]" />
                 <col className="w-20" />
                 <col className="w-12" />
               </colgroup>
