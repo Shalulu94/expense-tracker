@@ -23,7 +23,7 @@ interface SpendingAreaChartProps {
   currency?: string;
 }
 
-export function SpendingAreaChart({ transactions, dateRange, isLoading, currency = 'GBP' }: SpendingAreaChartProps) {
+export function SpendingAreaChart({ transactions, dateRange, isLoading, currency = 'USD' }: SpendingAreaChartProps) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of transactions) {

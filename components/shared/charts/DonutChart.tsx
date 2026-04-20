@@ -32,7 +32,7 @@ function CustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent }: Pi
   );
 }
 
-export function DonutChart({ data, isLoading, currency = 'GBP' }: DonutChartProps) {
+export function DonutChart({ data, isLoading, currency = 'USD' }: DonutChartProps) {
   const chartData = data.map((b) => ({
     name: b.category.name,
     value: b.amount,

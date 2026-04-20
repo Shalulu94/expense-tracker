@@ -22,7 +22,7 @@ interface MonthlyBarChartProps {
   currency?: string;
 }
 
-export function MonthlyBarChart({ data, isLoading, currency = 'GBP' }: MonthlyBarChartProps) {
+export function MonthlyBarChart({ data, isLoading, currency = 'USD' }: MonthlyBarChartProps) {
   const chartData = data
     .slice(-6) // last 6 months
     .map((m) => ({ ...m, label: formatMonth(m.month) }));
