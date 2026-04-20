@@ -38,10 +38,11 @@ export function useSummaryStats(): {
       ? { category: categories.find((c) => c.id === topCategoryId)!, amount: topAmount }
       : null;
 
-    // Monthly average: divide by the number of distinct calendar months that
-    // actually have expense transactions, not the width of the date range filter.
-    // This avoids counting empty months and gives a true spending average.
-    const monthsWithData = new Set(expenses.map((t) => toMonthKey(t.date))).size;
+    // Monthly average: divide by all months with expense data across the entire
+    // dataset, not just the filtered subset. This prevents the active date filter
+    // from shrinking the denominator and inflating the average.
+    const allExpenses = transactions.filter((t) => t.type === 'expense');
+    const monthsWithData = new Set(allExpenses.map((t) => toMonthKey(t.date))).size;
     const months = Math.max(1, monthsWithData);
 
     return {
