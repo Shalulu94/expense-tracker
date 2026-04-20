@@ -5,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { parseStatementFile } from '@/lib/parsers/csv-parser';
 import { applyRules } from '@/lib/categorization/rule-engine';
 import { callClaude } from '@/lib/categorization/ai-categorizer';
-import { normalizeMerchant } from '@/lib/categorization/normalizer';
+import { normalizeMerchant, extractMerchantPattern } from '@/lib/categorization/normalizer';
 import { findDuplicates } from '@/lib/categorization/deduplicator';
 import { getStorageProvider } from '@/lib/storage';
 import { DEFAULT_USER_ID } from '@/types/finance';
@@ -233,7 +233,7 @@ export function useImport() {
         if (!row.categoryId) continue;
 
         const normalized = normalizeMerchant(row.description);
-        const pattern = (normalized.split(' ')[0] ?? normalized).toLowerCase();
+        const pattern = extractMerchantPattern(normalized).toLowerCase();
         if (!pattern) continue;
 
         const existing = patternToRule.get(pattern);

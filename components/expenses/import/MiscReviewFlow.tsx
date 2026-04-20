@@ -20,7 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useAppStore } from '@/lib/store';
 import { useCategories } from '@/lib/hooks/useCategories';
-import { normalizeMerchant } from '@/lib/categorization/normalizer';
+import { normalizeMerchant, extractMerchantPattern } from '@/lib/categorization/normalizer';
 import { formatCurrency } from '@/lib/utils/currency';
 import { formatDate } from '@/lib/utils/date';
 
@@ -54,6 +54,7 @@ export function MiscReviewFlow({ open, onClose }: MiscReviewFlowProps) {
     setIsSaving(true);
 
     const normalized = normalizeMerchant(current.merchantRaw ?? current.description);
+    const pattern = extractMerchantPattern(normalized);
 
     // Update this transaction
     await updateTransaction(current.id, {
@@ -61,11 +62,12 @@ export function MiscReviewFlow({ open, onClose }: MiscReviewFlowProps) {
       categorizationSource: 'user-correction',
     });
 
-    // Apply to all similar transactions in Misc
+    // Apply to all similar transactions in Misc using the same pattern
     if (applyToSimilar) {
       const similar = miscTransactions.filter(
-        (t) => t.id !== current.id &&
-          normalizeMerchant(t.merchantRaw ?? t.description).includes(normalized.split(' ')[0] ?? '')
+        (t) =>
+          t.id !== current.id &&
+          normalizeMerchant(t.merchantRaw ?? t.description).includes(pattern)
       );
       for (const tx of similar) {
         await updateTransaction(tx.id, {
@@ -75,9 +77,9 @@ export function MiscReviewFlow({ open, onClose }: MiscReviewFlowProps) {
       }
     }
 
-    // Create merchant rule
+    // Create merchant rule using the full extracted pattern
     await createMerchantRule({
-      pattern: normalized.split(' ')[0] ?? normalized,
+      pattern,
       isRegex: false,
       categoryId: selectedCategoryId,
       source: 'user',

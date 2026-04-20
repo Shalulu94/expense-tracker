@@ -3,6 +3,7 @@
 import { PageHeader } from '@/components/shared/PageHeader';
 import { CategoryManager } from '@/components/expenses/CategoryManager';
 import { ApiKeySettings } from '@/components/expenses/settings/ApiKeySettings';
+import { RulesManager } from '@/components/expenses/settings/RulesManager';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,7 @@ export default function SettingsPage() {
         </div>
 
         <ApiKeySettings />
+        <RulesManager />
         <CategoryManager />
       </main>
     </div>
