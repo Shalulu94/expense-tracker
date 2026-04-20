@@ -5,15 +5,30 @@ import { useAppStore } from '@/lib/store';
 import { useTransactions } from './useTransactions';
 import { useCategories } from './useCategories';
 
-export function useSummaryStats(): {
+interface SummaryFilter {
+  parentId?: string | null;
+  categoryId?: string | null;
+}
+
+export function useSummaryStats(categoryFilter?: SummaryFilter): {
   summary: ExpenseSummary;
   categoryBreakdown: CategoryBreakdown[];
   monthlyTotals: MonthlyTotals[];
 } {
-  const { filtered } = useTransactions();
+  const { filtered: allFiltered } = useTransactions();
   const { categories } = useCategories();
   const filters = useAppStore((s) => s.filters);
   const transactions = useAppStore((s) => s.transactions);
+
+  // Apply optional category drill-down on top of the existing date/search filters
+  const filtered = categoryFilter?.categoryId
+    ? allFiltered.filter((t) => t.categoryId === categoryFilter.categoryId)
+    : categoryFilter?.parentId
+    ? allFiltered.filter((t) => {
+        const cat = categories.find((c) => c.id === t.categoryId);
+        return t.categoryId === categoryFilter.parentId || cat?.parentId === categoryFilter.parentId;
+      })
+    : allFiltered;
 
   const dateRange = filters.datePreset !== 'custom'
     ? getDateRangeForPreset(filters.datePreset)
