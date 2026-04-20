@@ -216,18 +216,20 @@ export const BANK_FORMAT_PROFILES: BankFormatProfile[] = [
   },
 
   // ── Westpac AU ────────────────────────────────────────────────────────────
+  // Columns: Bank Account, Date, Narrative, Debit Amount, Credit Amount, Balance, Categories, Serial
+  // Only import debit rows — credits are payments received / refunds, not expenses.
   {
     id: 'westpac-au',
     name: 'Westpac (AU)',
     country: 'AU',
     detect: (headers) => hasHeaders(headers, 'Date', 'Narrative', 'Debit Amount', 'Credit Amount', 'Balance'),
     map: (row): NormalizedRow | null => {
-      const debit = parseAmount(row['Debit Amount'] ?? '0');
-      const credit = parseAmount(row['Credit Amount'] ?? '0');
+      const debit = parseAmount(row['Debit Amount'] ?? '');
+      if (!debit) return null; // skip credits / empty rows
       return {
         date: parseDate(row['Date'] ?? '', 'dd/MM/yyyy'),
         description: (row['Narrative'] ?? '').trim(),
-        amount: Math.abs(debit > 0 ? debit : credit),
+        amount: debit,
         balance: parseAmount(row['Balance'] ?? '0'),
       };
     },
@@ -325,7 +327,20 @@ export const BANK_FORMAT_PROFILES: BankFormatProfile[] = [
   },
 ];
 
-export function detectBankFormat(headers: string[]): BankFormatProfile | null {
+// Ordered list of selectable banks for the UI dropdown (excludes generic + headerless)
+export const SELECTABLE_BANK_PROFILES = BANK_FORMAT_PROFILES.filter(
+  (p) => !p.headerless && p.id !== 'generic'
+).map((p) => ({ id: p.id, name: p.name, country: p.country }));
+
+export function getProfileById(id: string): BankFormatProfile | null {
+  return BANK_FORMAT_PROFILES.find((p) => p.id === id) ?? null;
+}
+
+export function detectBankFormat(headers: string[], forceProfileId?: string): BankFormatProfile | null {
+  if (forceProfileId) {
+    const forced = getProfileById(forceProfileId);
+    if (forced) return forced;
+  }
   // Only try header-based (non-headerless) profiles
   const specific = BANK_FORMAT_PROFILES.filter((p) => !p.headerless && p.id !== 'generic');
   for (const profile of specific) {

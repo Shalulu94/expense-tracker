@@ -44,17 +44,17 @@ export function useImport() {
   const [importState, setImportState] = useState<ImportState | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const processFile = useCallback(async (file: File) => {
+  const processFile = useCallback(async (file: File, bankProfileId?: string) => {
     setImportState({
       filename: file.name,
-      bankProfileId: '',
+      bankProfileId: bankProfileId ?? '',
       rows: [],
       isProcessing: true,
       processingProgress: 0,
       error: null,
     });
 
-    const { profile, rows, errors } = await parseStatementFile(file);
+    const { profile, rows, errors } = await parseStatementFile(file, bankProfileId);
 
     if (errors.length > 0 && rows.length === 0) {
       setImportState((s) => s && ({ ...s, isProcessing: false, error: errors[0] }));

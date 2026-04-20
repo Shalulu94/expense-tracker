@@ -6,7 +6,7 @@ import { TransactionFilters } from '@/components/expenses/TransactionFilters';
 import { TransactionList } from '@/components/expenses/TransactionList';
 import { TransactionForm } from '@/components/expenses/TransactionForm';
 import { ExportButton } from '@/components/expenses/ExportButton';
-import { ImportButton } from '@/components/expenses/import/ImportButton';
+import { ImportDialog } from '@/components/expenses/import/ImportDialog';
 import { ImportPreviewModal } from '@/components/expenses/import/ImportPreviewModal';
 import { MiscReviewCard } from '@/components/expenses/import/MiscReviewCard';
 import { DonutChart } from '@/components/shared/charts/DonutChart';
@@ -65,7 +65,7 @@ export default function ExpensesPage() {
           </div>
           <div className="flex items-center gap-2">
             <ExportButton />
-            <ImportButton
+            <ImportDialog
               onFileSelect={processFile}
               isLoading={importState?.isProcessing}
             />

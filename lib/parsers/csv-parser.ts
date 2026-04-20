@@ -9,16 +9,16 @@ export interface ParseResult {
   errors: string[];
 }
 
-export async function parseStatementFile(file: File): Promise<ParseResult> {
-  // 1. Try header-based detection first
-  const headerResult = await parseWithHeaders(file);
+export async function parseStatementFile(file: File, forceProfileId?: string): Promise<ParseResult> {
+  // 1. Try header-based detection first (with optional forced profile)
+  const headerResult = await parseWithHeaders(file, forceProfileId);
   if (headerResult.profile) return headerResult;
 
-  // 2. Fall back to headerless detection
+  // 2. Fall back to headerless detection (force not applicable here)
   return parseHeaderless(file);
 }
 
-function parseWithHeaders(file: File): Promise<ParseResult> {
+function parseWithHeaders(file: File, forceProfileId?: string): Promise<ParseResult> {
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -26,7 +26,7 @@ function parseWithHeaders(file: File): Promise<ParseResult> {
       complete: (results) => {
         const rawHeaders = results.meta.fields ?? [];
         const errors: string[] = results.errors.map((e) => e.message);
-        const profile = detectBankFormat(rawHeaders);
+        const profile = detectBankFormat(rawHeaders, forceProfileId);
         const rows: NormalizedRow[] = [];
 
         if (profile) {
