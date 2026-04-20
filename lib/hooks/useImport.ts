@@ -6,6 +6,7 @@ import { parseStatementFile } from '@/lib/parsers/csv-parser';
 import { applyRules } from '@/lib/categorization/rule-engine';
 import { callClaude } from '@/lib/categorization/ai-categorizer';
 import { normalizeMerchant, extractMerchantPattern } from '@/lib/categorization/normalizer';
+import { isAutoExcluded } from '@/lib/categorization/auto-exclude';
 import { findDuplicates } from '@/lib/categorization/deduplicator';
 import { getStorageProvider } from '@/lib/storage';
 import { DEFAULT_USER_ID } from '@/types/finance';
@@ -160,7 +161,7 @@ export function useImport() {
         categorizationSource: source,
         categorizationConfidence: confidence,
         isDuplicate: duplicateIndices.has(i),
-        excluded: duplicateIndices.has(i), // duplicates excluded by default
+        excluded: duplicateIndices.has(i) || isAutoExcluded(row.description),
         aiReasoning,
       });
     }
