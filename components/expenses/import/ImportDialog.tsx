@@ -46,20 +46,7 @@ export function ImportDialog({ onFileSelect, isLoading }: ImportDialogProps) {
     inputRef.current?.click();
   }
 
-  // Group profiles by country for the dropdown
-  const byCountry = SELECTABLE_BANK_PROFILES.reduce<Record<string, typeof SELECTABLE_BANK_PROFILES>>(
-    (acc, p) => {
-      (acc[p.country] ??= []).push(p);
-      return acc;
-    },
-    {}
-  );
-
-  const countryLabels: Record<string, string> = {
-    AU: 'Australia',
-    GB: 'United Kingdom',
-    US: 'United States',
-  };
+  const auBanks = SELECTABLE_BANK_PROFILES.filter((p) => p.country === 'AU');
 
   return (
     <>
@@ -89,24 +76,17 @@ export function ImportDialog({ onFileSelect, isLoading }: ImportDialogProps) {
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="bank-select">Bank / Institution</Label>
+              <Label htmlFor="bank-select">Bank</Label>
               <Select value={selectedBank} onValueChange={(v) => setSelectedBank(v ?? AUTO_DETECT)}>
                 <SelectTrigger id="bank-select">
                   <SelectValue placeholder="Select bank…" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={AUTO_DETECT}>Auto-detect format</SelectItem>
-                  {Object.entries(byCountry).map(([country, profiles]) => (
-                    <div key={country}>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                        {countryLabels[country] ?? country}
-                      </div>
-                      {profiles.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </div>
+                  {auBanks.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
