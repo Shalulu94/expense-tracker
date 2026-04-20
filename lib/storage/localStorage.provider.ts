@@ -240,10 +240,14 @@ export class LocalStorageProvider implements IStorageProvider {
     const userCategories = existingCategories.filter((c) => !c.isSystem);
     this.write(KEYS.CATEGORIES, [...data.categories, ...userCategories]);
 
-    // Always replace system merchant rules with the current list,
-    // preserving user and ai-learned rules.
+    // Always replace system merchant rules with the current list.
+    // Preserve user and ai-learned rules, but drop any whose categoryId no
+    // longer exists (stale rules from a previous category structure).
+    const validCategoryIds = new Set(data.categories.map((c) => c.id));
     const existingRules = this.read<MerchantRule>(KEYS.MERCHANT_RULES);
-    const userRules = existingRules.filter((r) => r.source !== 'system');
+    const userRules = existingRules.filter(
+      (r) => r.source !== 'system' && validCategoryIds.has(r.categoryId)
+    );
     this.write(KEYS.MERCHANT_RULES, [...data.merchantRules, ...userRules]);
   }
 

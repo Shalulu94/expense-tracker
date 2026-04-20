@@ -222,29 +222,56 @@ export function useImport() {
     // Write all transactions in one localStorage call — no per-row re-renders
     await storage.createTransactionsBatch(txData);
 
-    // Learn from corrections — collect new rules, write them in one pass
+    // Learn from corrections
     if (learnFromCorrections) {
-      const existingPatterns = new Set(merchantRules.map((r) => r.pattern.toLowerCase()));
-      const rulesToCreate: Omit<typeof merchantRules[0], 'id' | 'createdAt' | 'updatedAt'>[] = [];
+      // Build a live map of pattern → rule so we can upsert correctly
+      const patternToRule = new Map(
+        merchantRules.map((r) => [r.pattern.toLowerCase(), r])
+      );
 
       for (const row of toImport) {
-        if (row.categorizationSource === 'rule' || !row.categoryId) continue;
+        if (!row.categoryId) continue;
+
         const normalized = normalizeMerchant(row.description);
-        const pattern = normalized.split(' ')[0] ?? normalized;
-        if (pattern && !existingPatterns.has(pattern.toLowerCase())) {
-          existingPatterns.add(pattern.toLowerCase()); // avoid duplicates within this batch
-          rulesToCreate.push({
+        const pattern = (normalized.split(' ')[0] ?? normalized).toLowerCase();
+        if (!pattern) continue;
+
+        const existing = patternToRule.get(pattern);
+        const isCorrection = row.categorizationSource === 'user-correction';
+
+        if (isCorrection) {
+          // User explicitly changed the category — save as a high-priority 'user'
+          // rule so it overrides both system and ai-learned rules in future imports.
+          if (existing) {
+            if (existing.categoryId !== row.categoryId || existing.source !== 'user') {
+              await storage.updateMerchantRule(existing.id, {
+                categoryId: row.categoryId,
+                source: 'user',
+              });
+              patternToRule.set(pattern, { ...existing, categoryId: row.categoryId, source: 'user' });
+            }
+          } else {
+            const created = await storage.createMerchantRule({
+              pattern,
+              isRegex: false,
+              categoryId: row.categoryId,
+              source: 'user',
+              matchCount: 1,
+            });
+            patternToRule.set(pattern, created);
+          }
+        } else if (!existing && row.categorizationSource !== 'rule') {
+          // New pattern not yet in any rule, categorised by AI or left as manual —
+          // save as ai-learned so future imports skip the AI call.
+          const created = await storage.createMerchantRule({
             pattern,
             isRegex: false,
             categoryId: row.categoryId,
             source: 'ai-learned',
             matchCount: 1,
           });
+          patternToRule.set(pattern, created);
         }
-      }
-
-      for (const ruleData of rulesToCreate) {
-        await storage.createMerchantRule(ruleData);
       }
     }
 
