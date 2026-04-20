@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { Transaction, Category, ExpenseSummary, CategoryBreakdown, MonthlyTotals } from '@/types/finance';
-import { daysBetween, toMonthKey, getDateRangeForPreset } from '@/lib/utils/date';
+import { toMonthKey, getDateRangeForPreset } from '@/lib/utils/date';
 import { useAppStore } from '@/lib/store';
 import { useTransactions } from './useTransactions';
 import { useCategories } from './useCategories';
@@ -21,9 +21,7 @@ export function useSummaryStats(): {
 
   const summary: ExpenseSummary = useMemo(() => {
     const expenses = filtered.filter((t) => t.type === 'expense');
-    const incomes = filtered.filter((t) => t.type === 'income');
     const totalSpent = expenses.reduce((sum, t) => sum + t.amount, 0);
-    const totalIncome = incomes.reduce((sum, t) => sum + t.amount, 0);
 
     // Top category by spend — roll up to parent so the stat matches the chart.
     const categoryTotals = new Map<string, number>();
@@ -40,13 +38,17 @@ export function useSummaryStats(): {
       ? { category: categories.find((c) => c.id === topCategoryId)!, amount: topAmount }
       : null;
 
-    const days = daysBetween(dateRange.from, dateRange.to);
+    // Monthly average: count distinct calendar months spanned by the date range.
+    const from = new Date(dateRange.from);
+    const to = new Date(dateRange.to);
+    const months = Math.max(
+      1,
+      (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth()) + 1
+    );
 
     return {
       totalSpent,
-      totalIncome,
-      netAmount: totalIncome - totalSpent,
-      avgPerDay: totalSpent / days,
+      avgPerMonth: totalSpent / months,
       transactionCount: filtered.length,
       topCategory: topCategory?.category ? topCategory : null,
       dateRange,

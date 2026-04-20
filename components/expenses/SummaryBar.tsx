@@ -4,7 +4,7 @@ import { useSummaryStats } from '@/lib/hooks/useSummaryStats';
 import { StatCard } from '@/components/shared/StatCard';
 import { formatCurrency } from '@/lib/utils/currency';
 import { useAppStore } from '@/lib/store';
-import { TrendingDown, TrendingUp, Wallet, Calendar, Tag } from 'lucide-react';
+import { TrendingDown, Wallet, Calendar, Tag } from 'lucide-react';
 
 interface SummaryBarProps {
   currency?: string;
@@ -15,7 +15,7 @@ export function SummaryBar({ currency = 'GBP' }: SummaryBarProps) {
   const isLoading = useAppStore((s) => s.isLoading);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <StatCard
         label="Total Spent"
         value={formatCurrency(summary.totalSpent, currency)}
@@ -23,20 +23,8 @@ export function SummaryBar({ currency = 'GBP' }: SummaryBarProps) {
         isLoading={isLoading}
       />
       <StatCard
-        label="Total Income"
-        value={formatCurrency(summary.totalIncome, currency)}
-        icon={<TrendingUp className="size-4" />}
-        isLoading={isLoading}
-      />
-      <StatCard
-        label="Net"
-        value={formatCurrency(summary.netAmount, currency)}
-        trend={summary.netAmount >= 0 ? 'up' : 'down'}
-        isLoading={isLoading}
-      />
-      <StatCard
-        label="Avg / Day"
-        value={formatCurrency(summary.avgPerDay, currency)}
+        label="Avg / Month"
+        value={formatCurrency(summary.avgPerMonth, currency)}
         icon={<Calendar className="size-4" />}
         isLoading={isLoading}
       />

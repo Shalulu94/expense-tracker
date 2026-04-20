@@ -140,9 +140,7 @@ export interface TransactionFilters {
 
 export interface ExpenseSummary {
   totalSpent: number;
-  totalIncome: number;
-  netAmount: number;
-  avgPerDay: number;
+  avgPerMonth: number;
   transactionCount: number;
   topCategory: { category: Category; amount: number } | null;
   dateRange: DateRange;
