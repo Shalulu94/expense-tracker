@@ -12,8 +12,10 @@ import type { DatePreset } from '@/types/finance';
 
 const PRESETS: { label: string; value: DatePreset }[] = [
   { label: 'This Month', value: 'this_month' },
-  { label: 'Last 3 Months', value: 'last_3_months' },
+  { label: '3 Months', value: 'last_3_months' },
+  { label: '6 Months', value: 'last_6_months' },
   { label: 'This Year', value: 'this_year' },
+  { label: 'This FY', value: 'this_financial_year' },
 ];
 
 export function DateRangePicker() {

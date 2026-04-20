@@ -117,7 +117,7 @@ export interface AiCacheEntry {
 
 // ─── Filters ─────────────────────────────────────────────────────────────────
 
-export type DatePreset = 'this_month' | 'last_3_months' | 'this_year' | 'custom';
+export type DatePreset = 'this_month' | 'last_3_months' | 'last_6_months' | 'this_year' | 'this_financial_year' | 'custom';
 
 export interface DateRange {
   from: string;

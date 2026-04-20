@@ -14,6 +14,8 @@ import {
   isAfter,
   isBefore,
   isEqual,
+  getMonth,
+  getYear,
 } from 'date-fns';
 import type { DatePreset, DateRange } from '@/types/finance';
 
@@ -59,11 +61,28 @@ export function getDateRangeForPreset(preset: DatePreset): DateRange {
         from: format(startOfMonth(subMonths(now, 2)), 'yyyy-MM-dd'),
         to: format(endOfMonth(now), 'yyyy-MM-dd'),
       };
+    case 'last_6_months':
+      return {
+        from: format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd'),
+        to: format(endOfMonth(now), 'yyyy-MM-dd'),
+      };
     case 'this_year':
       return {
         from: format(startOfYear(now), 'yyyy-MM-dd'),
         to: format(endOfYear(now), 'yyyy-MM-dd'),
       };
+    case 'this_financial_year': {
+      // Australian financial year: 1 Jul – 30 Jun
+      const month = getMonth(now); // 0-indexed; July = 6
+      const year = getYear(now);
+      const fyStartYear = month >= 6 ? year : year - 1;
+      const fyStart = new Date(fyStartYear, 6, 1);         // 1 Jul
+      const fyEnd = new Date(fyStartYear + 1, 5, 30);      // 30 Jun
+      return {
+        from: format(fyStart, 'yyyy-MM-dd'),
+        to: format(fyEnd, 'yyyy-MM-dd'),
+      };
+    }
     case 'custom':
       return {
         from: format(startOfMonth(now), 'yyyy-MM-dd'),
