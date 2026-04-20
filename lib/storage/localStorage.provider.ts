@@ -234,23 +234,17 @@ export class LocalStorageProvider implements IStorageProvider {
   // ── Utility ─────────────────────────────────────────────────────────────────
 
   async seed(data: { categories: Category[]; merchantRules: MerchantRule[] }): Promise<void> {
-    if (this.read<Category>(KEYS.CATEGORIES).length === 0) {
-      this.write(KEYS.CATEGORIES, data.categories);
-    }
+    // Always replace system categories with the current DEFAULT_CATEGORIES list,
+    // preserving any user-created categories.
+    const existingCategories = this.read<Category>(KEYS.CATEGORIES);
+    const userCategories = existingCategories.filter((c) => !c.isSystem);
+    this.write(KEYS.CATEGORIES, [...data.categories, ...userCategories]);
 
+    // Always replace system merchant rules with the current list,
+    // preserving user and ai-learned rules.
     const existingRules = this.read<MerchantRule>(KEYS.MERCHANT_RULES);
-    if (existingRules.length === 0) {
-      this.write(KEYS.MERCHANT_RULES, data.merchantRules);
-    } else {
-      // Add any new system rules that don't already exist by pattern.
-      const existingPatterns = new Set(existingRules.map((r) => r.pattern.toLowerCase()));
-      const newRules = data.merchantRules.filter(
-        (r) => !existingPatterns.has(r.pattern.toLowerCase())
-      );
-      if (newRules.length > 0) {
-        this.write(KEYS.MERCHANT_RULES, [...existingRules, ...newRules]);
-      }
-    }
+    const userRules = existingRules.filter((r) => r.source !== 'system');
+    this.write(KEYS.MERCHANT_RULES, [...data.merchantRules, ...userRules]);
   }
 
   async clear(): Promise<void> {

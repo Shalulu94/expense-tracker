@@ -18,14 +18,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface TransactionRowProps {
   transaction: Transaction;
   category: Category | undefined;
   currency?: string;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
-export function TransactionRow({ transaction, category, currency = 'GBP' }: TransactionRowProps) {
+export function TransactionRow({ transaction, category, currency = 'USD', isSelected = false, onToggleSelect }: TransactionRowProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteGroupOpen, setDeleteGroupOpen] = useState(false);
   const openTransactionModal = useAppStore((s) => s.openTransactionModal);
@@ -49,6 +52,14 @@ export function TransactionRow({ transaction, category, currency = 'GBP' }: Tran
   return (
     <>
       <div className="flex items-center gap-3 py-3 px-4 hover:bg-muted/40 rounded-lg group transition-colors">
+        {/* Checkbox */}
+        <Checkbox
+          checked={isSelected}
+          onCheckedChange={() => onToggleSelect?.(transaction.id)}
+          aria-label="Select transaction"
+          className="shrink-0"
+        />
+
         {/* Date */}
         <span className="text-xs text-muted-foreground w-20 shrink-0 hidden sm:block">
           {formatDate(transaction.date)}

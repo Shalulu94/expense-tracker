@@ -1,9 +1,9 @@
 export function formatCurrency(
   amount: number,
-  currency = 'GBP',
+  currency = 'USD',
   options?: Intl.NumberFormatOptions
 ): string {
-  return new Intl.NumberFormat('en-GB', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
@@ -12,7 +12,7 @@ export function formatCurrency(
   }).format(amount);
 }
 
-export function formatCurrencyCompact(amount: number, currency = 'GBP'): string {
+export function formatCurrencyCompact(amount: number, currency = 'USD'): string {
   if (Math.abs(amount) >= 1000) {
     return formatCurrency(amount, currency, { notation: 'compact' });
   }

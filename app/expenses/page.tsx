@@ -88,7 +88,7 @@ export default function ExpensesPage() {
         <MiscReviewCard count={miscCount} />
 
         {/* KPI strip */}
-        <SummaryBar currency="GBP" />
+        <SummaryBar currency="USD" />
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -112,7 +112,7 @@ export default function ExpensesPage() {
             </div>
             <Separator />
             <div className="p-2">
-              <TransactionList currency="GBP" />
+              <TransactionList currency="USD" />
             </div>
           </CardContent>
         </Card>
