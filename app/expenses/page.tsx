@@ -17,6 +17,8 @@ import { useAppStore } from '@/lib/store';
 import { useSummaryStats } from '@/lib/hooks/useSummaryStats';
 import { useTransactions } from '@/lib/hooks/useTransactions';
 import { useImport } from '@/lib/hooks/useImport';
+import { CategoryDetailsTable } from '@/components/expenses/CategoryDetailsTable';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Plus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -87,35 +89,61 @@ export default function ExpensesPage() {
         {/* Misc review prompt */}
         <MiscReviewCard count={miscCount} />
 
-        {/* KPI strip */}
-        <SummaryBar currency="USD" />
+        <Tabs defaultValue="overview">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="details">Details</TabsTrigger>
+          </TabsList>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <DonutChart data={categoryBreakdown} isLoading={isLoading} />
-          <div className="lg:col-span-2 grid grid-rows-2 gap-4">
-            <SpendingAreaChart
-              transactions={filteredTransactions}
-              dateRange={filters.dateRange}
-              isLoading={isLoading}
-            />
-            <MonthlyBarChart data={monthlyTotals} isLoading={isLoading} />
-          </div>
-        </div>
+          {/* Overview tab */}
+          <TabsContent value="overview" className="space-y-6 mt-4">
+            <SummaryBar currency="USD" />
 
-        {/* Transaction list */}
-        <Card>
-          <CardContent className="p-0">
-            <div className="p-4 flex flex-wrap items-center gap-3 justify-between">
-              <h2 className="font-semibold">Transactions</h2>
-              <TransactionFilters />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <DonutChart data={categoryBreakdown} isLoading={isLoading} />
+              <div className="lg:col-span-2 grid grid-rows-2 gap-4">
+                <SpendingAreaChart
+                  transactions={filteredTransactions}
+                  dateRange={filters.dateRange}
+                  isLoading={isLoading}
+                />
+                <MonthlyBarChart data={monthlyTotals} isLoading={isLoading} />
+              </div>
             </div>
-            <Separator />
-            <div className="p-2">
-              <TransactionList currency="USD" />
-            </div>
-          </CardContent>
-        </Card>
+
+            <Card>
+              <CardContent className="p-0">
+                <div className="p-4 flex flex-wrap items-center gap-3 justify-between">
+                  <h2 className="font-semibold">Transactions</h2>
+                  <TransactionFilters />
+                </div>
+                <Separator />
+                <div className="p-2">
+                  <TransactionList currency="USD" />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Details tab */}
+          <TabsContent value="details" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                <div className="p-4 flex flex-wrap items-center gap-3 justify-between">
+                  <div>
+                    <h2 className="font-semibold">Category Breakdown</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Totals respect the active date filter. Click a parent row to collapse subcategories.
+                    </p>
+                  </div>
+                  <TransactionFilters />
+                </div>
+                <Separator />
+                <CategoryDetailsTable currency="USD" />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Modals */}
