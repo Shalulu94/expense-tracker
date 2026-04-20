@@ -134,18 +134,22 @@ export function RulesManager() {
 
   // ── Edit dialog ───────────────────────────────────────────────────────────
   const [editingRule, setEditingRule] = useState<MerchantRule | null>(null);
+  const [editPattern, setEditPattern] = useState('');
   const [editCategoryId, setEditCategoryId] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   function openEdit(rule: MerchantRule) {
     setEditingRule(rule);
+    setEditPattern(rule.pattern);
     setEditCategoryId(rule.categoryId);
   }
 
   async function handleEdit() {
-    if (!editingRule || !editCategoryId) return;
+    const pattern = editPattern.trim().toLowerCase();
+    if (!editingRule || !pattern || !editCategoryId) return;
     setIsSavingEdit(true);
     await updateMerchantRule(editingRule.id, {
+      pattern,
       categoryId: editCategoryId,
       source: 'user',
     });
@@ -301,7 +305,15 @@ export function RulesManager() {
             <div className="space-y-4">
               <div>
                 <Label className="mb-1.5 block">Pattern</Label>
-                <p className="font-mono text-sm bg-muted px-3 py-2 rounded-md">{editingRule.pattern}</p>
+                <Input
+                  className="font-mono text-sm"
+                  value={editPattern}
+                  onChange={(e) => setEditPattern(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleEdit()}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Lowercase. Any transaction whose description contains this phrase will match.
+                </p>
               </div>
               <div>
                 <Label className="mb-1.5 block">Category</Label>
@@ -312,7 +324,7 @@ export function RulesManager() {
               <Button variant="outline" onClick={() => setEditingRule(null)}>Cancel</Button>
               <Button
                 onClick={handleEdit}
-                disabled={!editCategoryId || isSavingEdit}
+                disabled={!editPattern.trim() || !editCategoryId || isSavingEdit}
               >
                 {isSavingEdit ? 'Saving…' : 'Save Changes'}
               </Button>
