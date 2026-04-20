@@ -38,13 +38,11 @@ export function useSummaryStats(): {
       ? { category: categories.find((c) => c.id === topCategoryId)!, amount: topAmount }
       : null;
 
-    // Monthly average: count distinct calendar months spanned by the date range.
-    const from = new Date(dateRange.from);
-    const to = new Date(dateRange.to);
-    const months = Math.max(
-      1,
-      (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth()) + 1
-    );
+    // Monthly average: divide by the number of distinct calendar months that
+    // actually have expense transactions, not the width of the date range filter.
+    // This avoids counting empty months and gives a true spending average.
+    const monthsWithData = new Set(expenses.map((t) => toMonthKey(t.date))).size;
+    const months = Math.max(1, monthsWithData);
 
     return {
       totalSpent,
