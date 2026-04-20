@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -95,18 +95,19 @@ export function TransactionFilters() {
             return (
               <div key={parent.id}>
                 {i > 0 && <DropdownMenuSeparator />}
-                <DropdownMenuLabel
-                  className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold cursor-pointer hover:bg-accent rounded-sm"
+                <DropdownMenuItem
+                  className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold"
                   onClick={() => toggleParent(parent.id, children.map((c) => c.id))}
+                  closeOnClick={false}
                 >
                   <span
                     className={cn(
-                      'size-3.5 rounded-sm border flex items-center justify-center',
+                      'size-3.5 rounded-sm border flex items-center justify-center shrink-0',
                       allSelected ? 'bg-primary border-primary' : someSelected ? 'bg-primary/40 border-primary/40' : 'border-muted-foreground/30'
                     )}
                   />
                   {parent.icon} {parent.name}
-                </DropdownMenuLabel>
+                </DropdownMenuItem>
                 {children.map((child) => (
                   <DropdownMenuCheckboxItem
                     key={child.id}
